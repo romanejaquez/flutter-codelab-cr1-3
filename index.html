@@ -1,0 +1,587 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Flutter Codelab / Coding Roulette #3 - StatefulWidgets: Creating the Bottom Bar - Building Layouts in Flutter (Workshop)</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="flutter-codelab-cr1-3"
+                  title="Flutter Codelab / Coding Roulette #3 - StatefulWidgets: Creating the Bottom Bar - Building Layouts in Flutter (Workshop)"
+                  environment="web"
+                  feedback-link="https://romanjustcodes.web.app">
+    
+      <google-codelab-step label="Overview" duration="0">
+        <p class="image-container"><img alt="AppBottomBar" src="img/b29b418227203d4b.png"></p>
+<h2 is-upgraded>What You&#39;ll Build in this Workshop:</h2>
+<ul>
+<li>Learn about StatefulWidgets in Flutter and how they maintain and encapsulate state</li>
+<li>Common Flutter Layout strategies using just core widgets</li>
+<li>Creating custom Flutter widgets (i.e. BottomBarWidget) and achieve widget composition</li>
+<li>Creating Dart models to mock up app data</li>
+<li>Import network images</li>
+<li>Using Material Icon fonts</li>
+</ul>
+<p class="image-container"><img alt="BottomBar" src="img/7029c4d506d976b0.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Pre-requisites" duration="0">
+        <ul>
+<li>A computer with a browser</li>
+<li>An internet connection</li>
+</ul>
+<aside class="special"><p>We&#39;ll be using <a href="https://dartpad.dev/" target="_blank">DartPad</a>, a web-based, open-source tool that offers an online playground for learning Dart and Flutter. For more info, visit <a href="https://dart.dev/tools/dartpad" target="_blank">this link</a>.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating The BottomBar widget" duration="0">
+        <aside class="warning"><p>This is the continuation of <a href="https://romanejaquez.github.io/flutter-codelab-cr1-2" target="_blank">Flutter Codelab / Coding Roulette #2</a>. Please complete <a href="https://romanejaquez.github.io/flutter-codelab-cr1-1" target="_blank">lab #1</a> and <a href="https://romanejaquez.github.io/flutter-codelab-cr1-2" target="_blank">lab #2</a> before completing this one.</p>
+</aside>
+<aside class="special"><p>For this widget, we won&#39;t be hooking up a tab navigation strategy to it; this is ONLY dealing with the layout of a custom bottom bar. In future labs, we&#39;ll be dealing with custom tab navigation.</p>
+</aside>
+<p>We&#39;re ready to tackle the layout of the last widget of the <strong>ListPage</strong> widget, which we&#39;re calling the <strong>BottomBarWidget</strong>, which is nothing more than a custom bar that can be used as tab navigation for this page, and switch between different views based on what the user has clicked. We will only do the layout and not perform any navigation, for the sake of this tutorial that deals with layout building.</p>
+<h2 is-upgraded>BottomBarWidget</h2>
+<p>For this widget, we&#39;ll be maintaining state within itself, hence this widget will inherit from <strong>StatefulWidget</strong>. Every time a user clicks on one of the bottom bar options, the widget&#39;s state changes - the state of which one is selected - which triggers a rebuild, and renders accordingly. That&#39;s in essence how StatefulWidgets work. More on <strong><em>StatefulWidgets </em></strong><a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html" target="_blank">here</a>.</p>
+<p>Let&#39;s show the schematic view of this widget, so we&#39;ll have a concrete idea of its composition and how we&#39;ll build it:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/7029c4d506d976b0.png"></p>
+<h3 is-upgraded>Creating the BottomBarWidget widget class / Adding Placeholder</h3>
+<p>As in the previous occasions, we first add a placeholder widget instance, then we create it. We&#39;ll do the same here.</p>
+<p>Back in the <strong>ListPage</strong> widget, inside the <strong>Column</strong> widget, right underneath the <strong>Expanded</strong> widget we created earlier that holds our <strong>ListView</strong> widget, add our upcoming widget <strong>BottomBarWidget</strong>.</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/60a73082009430a9.png"></p>
+<p>Let&#39;s work right under the <strong>AttractionCard</strong> widget we created earlier) or anywhere at the bottom of this file. Go ahead and create a <strong><em>StatefulWidget</em></strong>, which involves a two-step process.</p>
+<p>A widget that maintains its state and extending <strong>StatefulWidget</strong> is composed of two classes, the widget class that extends <strong>StatefulWidget</strong> and the <strong>State</strong> class.</p>
+<p>First step is creating a new class that extends <a href="https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html" target="_blank"><strong>StatefulWidget</strong></a> (in our case, a class called <strong>BottomBarWidget</strong>).</p>
+<p>In this class, you will override a special method called <strong>createState</strong>, which instantiates the companion <strong>State</strong> class, which by convention, it&#39;s usually named <strong>&lt;NAME_OF_WIDGET&gt;State</strong> (i.e. <strong><em>BottomBarWidgetState</em></strong> - we haven&#39;t created it yet, but we will in a minute).</p>
+<p>Second step is creating the class that will hold the state for this widget, which we&#39;ll call <strong>BottomBarWidgetState</strong> - this is the one that contains the build method, and every time the state changes, the build method gets triggered, rebuilding the widget, keeping it in sync with the data. This class extends <a href="https://api.flutter.dev/flutter/widgets/State-class.html" target="_blank"><strong>State</strong></a> and must be of type of its corresponding StatefulWidget (i.e. State&lt;BottomBarWidget&gt;) so as to establish the relationship between the widget and its state.</p>
+<p>As in the past, override the <strong>build</strong> method, add some dummy <strong>Container</strong> with a <strong>Text</strong> widget, just for testing. Add the text &#34;Bottom Bar&#34; to the <strong>Text</strong> widget.</p>
+<p>Right off the bat, the <strong>State</strong> class looks pretty much like a <strong>StatefulWidget</strong> class, with an overridden <strong>build</strong> method - we&#39;ll see down below what makes it so special.</p>
+<p>Your class(es) should look as follows:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/e1ab743f4f1138c6.png"></p>
+<p>If you hit the <strong>Run</strong> button on DartPad at this point in time, it should yield the following output in the preview panel on the right (see the text &#34;Bottom Bar&#34; at the bottom), which proves that things are hooked up and the widget is showing:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/83e8a429b0b79906.png"></p>
+<p>Let&#39;s dig in!</p>
+<h2 is-upgraded>Creating a Model for the Bottom Bar Item Data</h2>
+<p>Before we proceed further, we want to create a model that holds the data corresponding to each one of the bottom bar items (i.e. we want to show an icon, a label, a flag whether it is selected or not, etc.). This model will also hold information about the state we&#39;re keeping track of - which of the selected bottom bar items is selected.</p>
+<p>Let&#39;s create a model class called <strong>BottomBarItem</strong>, which will be just a regular class that will hold the following properties:</p>
+<ul>
+<li><strong>icon</strong>: type <strong><em>IconData</em></strong>, represents the icon to show for each item in the bottom bar</li>
+<li><strong>isSelected</strong>: type <strong><em>bool</em></strong>, holds the value of whether this is the currently selected item in the bottom bar</li>
+<li><strong>label</strong>: type *<strong>String</strong> represents the label to show underneath the tab item icon.</li>
+</ul>
+<aside class="special"><p>At this model anywhere in this file, as long as it is in scope - at the end of the file is fine.</p>
+</aside>
+<p>Your <strong>BottomBarItem</strong> model class should look as follows (grab the code as well and copy / paste it):</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/222c08ca230a9abe.png"></p>
+<p>Now that we have a way to represent each of the bottom bar items, let&#39;s create a collection of these items inside of the State so we can keep track of which one is selected.</p>
+<p>Proceed to the <strong>BottomBarWidgetState</strong> class; inside of the class, above the build method, create a property called <strong>barItems</strong>; make it a <strong>List</strong> of <strong>BottomBarItem</strong> models, and initialize it with an empty array, as follows:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/394459731c5d1a52.png"></p>
+<p>Now let&#39;s populate it with some mocked data:</p>
+<aside class="special"><p>Feel free to copy / paste it in order to avoid tedious typing! Place it at the top with the rest of the mocked data for this app.</p>
+</aside>
+<pre><code language="language-flutter" class="language-flutter">// populate the list of BottomBarItem models
+
+final List&lt;BottomBarItem&gt; barItemsList = [
+  BottomBarItem(label: &#39;Home&#39;, isSelected: true, icon: Icons.home),
+  BottomBarItem(label: &#39;Account&#39;, isSelected: false, icon: Icons.person),
+  BottomBarItem(label: &#39;Bookings&#39;, isSelected: false, icon: Icons.pending_actions),
+  BottomBarItem(label: &#39;Payments&#39;, isSelected: false, icon: Icons.payments),
+  BottomBarItem(label: &#39;More&#39;, isSelected: false, icon: Icons.more_horiz),
+];
+
+</code></pre>
+<p>Notice that the top item inserted has the <strong>isSelected</strong> property as <strong>true</strong> since we want the first item to display as selected by default.</p>
+<p>Back in the <strong>BottomBarWidgetState</strong> class, assign this hardcoded list of models (barItemsList) to the property we created locally list of bottom bar items (barItems).</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/b5843b6b42f56a3.png"></p>
+<p>Nice. Let&#39;s build up on that existing <strong>Container</strong> widget returned by the <strong>build</strong> method of the <strong>BottomBarWidgetState</strong> class.</p>
+<p>Let&#39;s set some of its properties to the following values:</p>
+<ul>
+<li>padding: 20px top, left and right, 15px bottom</li>
+</ul>
+<p class="image-container"><img alt="AppBottomBar" src="img/e5b719d37adaf4f5.png"></p>
+<aside class="special"><p>From this point forward, we&#39;ll be contentrating only on the <strong>Container</strong> object and showing you what&#39;s inside that block of code as we build it, for brevity and space.</p>
+</aside>
+<p>Replace the contents of the <strong>Container</strong> widget (the <strong>Text</strong> widget) by a <strong>Row</strong> widget (the items in the bottom bar will be laid out horizontally, evenly spaced out).</p>
+<p>Add a <strong>Row</strong> widget, and set its <strong>mainAxisAlignment</strong> property to <strong>MainAxisAlignment.spaceBetween</strong> - this will make its children space themselves evenly while adding space around them.</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/87e54f0a7bc5cffa.png"></p>
+<p>We&#39;ll generate the children of the <strong>Row</strong> widget as a list, based on the values available in the collection called <strong>barItems</strong> created earlier. We&#39;ll loop through these items and generate a corresponding widget from each of the items available.</p>
+<p>The factory method available in the <strong>List</strong> class called <strong>generate</strong> will simplify the looping throught the items in the <strong>barItems</strong> collection. This factory method takes two parameters: the length of the list (provided by <strong>barItems.length</strong>) and a callback, which will be executed for each of the items in the collection, and will pass an index into the callback - the index corresponding to each item in the collection. Assign this to the <strong>children</strong> property of the <strong>Row</strong> widget.</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/906030bf5b40ce75.png"></p>
+<p>Now, for each of the items in the <strong>barItems</strong> collection, we will grab the current bar item from the iteration (using the <strong>index</strong> supplied to the callback method) and grab the corresponding item from the <strong>barItems</strong> collection using this index. We&#39;ll also create a local variable called <strong>barItem</strong> to hold the resulting widget to render based on that logic.</p>
+<aside class="special"><p>We&#39;ll focus for a bit only on the callback in the List.generate method, for sake of brevity and space</p>
+</aside>
+<p>After pulling a model from the <strong>barItems</strong> collection and saving it into the <strong>barItem</strong> property, let&#39;s return out of this callback a small structure: a <strong>Column</strong> widget, holding two items: an <strong>Icon</strong> widget, populated by the <strong>icon</strong> property of the <strong>barItem</strong> model extracted earlier. Set its color to <strong>mainThemeColor</strong> if the <strong>isSelected</strong> property is <strong><em>true</em></strong>, otherwise, set it to <strong>grey</strong>.</p>
+<p>Below the <strong>Icon</strong> widget, add a <strong>Text</strong> widget, and set it to be the <strong>label</strong> property of the <strong>barItem</strong> model; for its style, set the color just like the <strong>Icon</strong> widget above (set its color to <strong>mainThemeColor</strong> if the <strong>isSelected</strong> property is <strong><em>true</em></strong>, otherwise, set it to <strong>grey</strong>), and with a font size of 11.</p>
+<p>The callback should look like this at the moment:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/bb6fbe82c8609580.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Wrapping the structure inside a GestureDectector" duration="0">
+        <p>In order to make this tiny structure (the <strong>Column</strong> widget with the <strong>Icon</strong> and the <strong>Text</strong> widget) clickable by the user, we will wrap it inside a <strong>GestureDectector</strong> widget, and leverage its <strong>onTap</strong> event to handle the tapping, as follows:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/b821fa292286128e.png"></p>
+<p>If you preview what you&#39;ve done so far by running it on DartPad, you might think you&#39;re done, but at least the structure is in plaace. If you tap on the items, nothing happens, but at least we should be all set to add the functionality that will occur upon tapping.</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/b821fa292286128e.png"></p>
+<p>Let&#39;s continue!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Triggering the widget to rebuild by calling 
+setState" duration="0">
+        <p>When a user taps on one of the bar items not selected, it will change the underlying model&#39;s <strong>isSelected</strong> flag to <strong>true</strong>; this is an indication that this widget&#39;s state has changed and that we want the widget visualization to sync with the data. The <strong>GestureDetector</strong> widget&#39;s <strong>onTap</strong> event will be used to trigger the change. By performing the desired change (flipping the value from <strong>false</strong> to <strong>true</strong> in the corresponding model) will trigger a set of events:</p>
+<ul>
+<li>The value in the model changes from true to false</li>
+<li>The widget gets notified that its user interface is not in sync with the data via the <strong>setState</strong> method</li>
+<li>A widget rebuild kicks off, re-rendering the list of <strong>Column</strong> widgets, with its internal structure of an <strong>Icon</strong> and a <strong>Text</strong> widget</li>
+<li>The corresponding <strong>Icon</strong> and <strong>Text</strong> widget that has the associated model with the <strong>isSelected</strong> property set to true will change its color to <strong>mainThemeColor</strong>, the rest will be gray</li>
+</ul>
+<p>Inside the <strong>onTap()</strong> event, call the <strong>setState()</strong> method, and inside of this method, loop through all <strong>barItems</strong> items, only marking as selected the one that matches with the <strong>barItem</strong> - the one in the current iteration:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/e39396852f0b2f87.png"></p>
+<p>Every time we press on one of the non-selected items, <strong>setState</strong> gets called, flag is reset for one of the items, widget rebuilds, and so on.</p>
+<p>If you take it for a spin on DartPad and hit <strong>Run</strong>, you&#39;ll notice the full-fledged <strong>BottomBarWidget</strong> widget. Click on the items on the bar and you&#39;ll see them change state accordingly, and the state contained only within this widget in a very efficient manner:</p>
+<p class="image-container"><img alt="AppBottomBar" src="img/1c739e10020a58ca.png"></p>
+<p>Also notice the full-fledged <strong>ListPage</strong> page widget, with all its widgets in place.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Wrap-up" duration="0">
+        <p>And with that, we&#39;re done with this codelab for this workshop, where we accomplished the following:</p>
+<ul>
+<li>Created the BottomBarWidget widget / wrapped up the ListPage widget</li>
+<li>Created the individual widgets that make up this page widget</li>
+<li>Created models and mocked data that fed these widgets</li>
+<li>Dive into building UI layouts in Flutter using just core widgets</li>
+<li>Delved into StatefulWidgets and how they changed state and trigger widget rebuilds</li>
+</ul>
+<aside class="special"><p><strong>Bonus</strong> - If you&#39;d like to complete part 4 of this workshop / codelab, follow this <a href="https://romanejaquez.github.io/flutter-codelab-cr1-4" target="_blank">link</a>. Thank you!</p>
+</aside>
+<h3 is-upgraded>Please don&#39;t forget to follow me on social media:</h3>
+<ul>
+<li>On Twitter (<a href="https://www.twitter.com/drcoderz" target="_blank">@drcoderz</a>)</li>
+<li>On YouTube (<a href="https://www.youtube.com/channel/UCKsp3r1ERjCpKJtD2n5WtPg" target="_blank">Roman Just Codes</a>)</li>
+<li>On My <a href="https://romanjustcodes.web.app/#/home" target="_blank">Personal Portfolio</a></li>
+<li>On <a href="https://medium.com/@romanejaquez" target="_blank">Medium</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Complete Code" duration="0">
+        <p>In case you fell behind on this codelab, below is the whole code for this codelab in a way you can copy / paste directly into DartPad:</p>
+<pre><code language="language-flutter" class="language-flutter">import &#39;package:flutter/material.dart&#39;;
+
+const Color mainThemeColor = Color(0xFF272D8D);
+
+final List&lt;Attraction&gt; attractionsList = [
+  Attraction(
+      imgPath:
+          &#39;https://cf.bstatic.com/xdata/images/hotel/max1024x768/275162028.jpg?k=38b638c8ec9ec86624f9a598482e95fa634d49aa3f99da1838cf5adde1a14521&amp;o=&amp;hp=1&#39;,
+      name: &#39;Grand Bavaro Princess&#39;,
+      desc: &#39;All-Inclusive Resort&#39;,
+      location: &#39;Punta Cana, DR&#39;,
+      rating: 3,
+      price: 80.0),
+  Attraction(
+      imgPath:
+          &#39;https://cf.bstatic.com/xdata/images/hotel/max1024x768/232161008.jpg?k=27808fe44ab95f6468e5433639bf117032c8271cebf5988bdcaa0a202b9a6d79&amp;o=&amp;hp=1&#39;,
+      name: &#39;Hyatt Ziva Cap Cana&#39;,
+      desc: &#39;All-Inclusive Resort&#39;,
+      price: 90.0,
+      rating: 4,
+      location: &#39;Punta Cana, DR&#39;),
+  Attraction(
+      imgPath:
+          &#39;https://cf.bstatic.com/xdata/images/hotel/max1024x768/256931299.jpg?k=57b5fb9732cd89f308def5386e221c46e52f48579345325714a310addf819274&amp;o=&amp;hp=1&#39;,
+      name: &#39;Impressive Punta Cana&#39;,
+      desc: &#39;All-Inclusive Resort&#39;,
+      price: 100.0,
+      rating: 5,
+      location: &#39;Punta Cana, DR&#39;),
+   Attraction(
+      imgPath:
+          &#39;https://cf.bstatic.com/xdata/images/hotel/max1024x768/283750757.jpg?k=4f3437bf1e1b077463c9900e4dd015633db1d96da38f034f4b70a4ba3ef76d82&amp;o=&amp;hp=1&#39;,
+      name: &#39;Villas Mar Azul Dreams&#39;,
+      desc: &#39;All-Inclusive Resort&#39;,
+      price: 100.0,
+      rating: 4,
+      location: &#39;Tallaboa, PR&#39;),
+];
+
+final List&lt;BottomBarItem&gt; barItemsList = [
+  BottomBarItem(label: &#39;Home&#39;, isSelected: true, icon: Icons.home),
+  BottomBarItem(label: &#39;Account&#39;, isSelected: false, icon: Icons.person),
+  BottomBarItem(label: &#39;Bookings&#39;, isSelected: false, icon: Icons.pending_actions),
+  BottomBarItem(label: &#39;Payments&#39;, isSelected: false, icon: Icons.payments),
+  BottomBarItem(label: &#39;More&#39;, isSelected: false, icon: Icons.more_horiz),
+];
+
+void main() {
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false, 
+      home: SplashPage()
+    )
+  );
+}
+
+class SplashPage extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) =&gt; ListPage())
+      );
+    });
+
+    return Stack(
+      children: [
+        Container(
+          color: mainThemeColor
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.pool, 
+            color: Colors.white, 
+            size: 80
+          )
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: LinearProgressIndicator(
+            valueColor: AlwaysStoppedAnimation&lt;Color&gt;(
+              Colors.white.withOpacity(0.4)
+            )
+          )
+        )
+      ],
+    );
+  }
+}
+
+class ListPage extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(color: Colors.white),
+        elevation: 0,
+        title: Icon(Icons.pool, color: Colors.white),
+        actions: [
+          Container(
+            margin: EdgeInsets.only(right: 15),
+            child: Icon(
+              Icons.notifications, 
+              color: Colors.white
+            )
+          )
+        ]
+      ),
+      backgroundColor: mainThemeColor,
+      body: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50),
+          topRight: Radius.circular(50)
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(50),
+              topRight: Radius.circular(50)
+            )
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: attractionsList.length,
+                  itemBuilder: (context, index) {
+                    Attraction attr = attractionsList[index];
+
+                    return AttractionCard(attraction: attr);
+                  })
+              ),
+              BottomBarWidget()
+            ]
+          )
+        )
+      )
+    );
+  }
+}
+
+class AttractionCard extends StatelessWidget {
+
+  Attraction? attraction;
+  AttractionCard({ this.attraction });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(40),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 20,
+            offset: Offset.zero,
+            color: Colors.black.withOpacity(0.1)
+          )
+        ]
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(40),
+        child: Container(
+          height: 300,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(attraction!.imgPath!),
+                        fit: BoxFit.cover
+                      )
+                    )
+                  ),
+                  Container(
+                    height: 150,
+                    padding: EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(attraction!.name!, 
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:14,
+                                fontWeight:FontWeight.bold
+                              )
+                            ),
+                            SizedBox(width: 5),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.pin_drop,
+                                  color: Colors.grey.withOpacity(0.7),
+                                  size: 12
+                                ),
+                                SizedBox(width: 5),
+                                Text(attraction!.location!,
+                                  style: TextStyle(
+                                    fontSize: 12, 
+                                    color: Colors.grey.withOpacity(0.7), 
+                                    fontWeight: FontWeight.bold
+                                  )
+                                ),
+                              ]
+                            ),
+                            SizedBox(width: 5),
+                            RatingWidget(rating: attraction!.rating!)
+                          ]
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(&#39;\$${attraction!.price!.toStringAsFixed(2)}&#39;,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:16,
+                                fontWeight: FontWeight.bold
+                              )
+                            ),
+                            SizedBox(height: 5),
+                            Text(&#39;Per Night&#39;,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.withOpacity(0.7),
+                                fontWeight: FontWeight.bold
+                              )
+                            )
+                          ],
+                        )
+                      ]
+                    )
+                  )
+                ],
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  child: Icon(
+                    Icons.favorite,
+                    color: Colors.white,
+                    size: 15
+                  ),
+                  margin: EdgeInsets.only(right: 10),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: mainThemeColor,
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10,
+                        color: mainThemeColor.withOpacity(0.5),
+                        offset:Offset.zero
+                      )
+                    ]
+                  )
+                )
+              )
+            ],
+          )
+        )
+      )
+    );
+  }
+}
+
+class BottomBarWidget extends StatefulWidget {
+  @override
+  BottomBarWidgetState createState() =&gt; BottomBarWidgetState();
+}
+
+class BottomBarWidgetState extends State&lt;BottomBarWidget&gt; {
+
+  List&lt;BottomBarItem&gt; barItems = barItemsList;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+        //... rest of the code omitted for brevity ...
+        children: List.generate(
+          barItems.length,
+          (index) {
+              
+            var barItem = barItems[index];
+
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  barItems.forEach((element) {
+                      element.isSelected = barItem == element;
+                  });
+                });
+              },
+              child: Column(
+                children: [
+                  Icon(barItem.icon, color: barItem.isSelected! 
+                    ? mainThemeColor : Colors.grey),
+                  Text(barItem.label!, style: TextStyle(
+                    color: (barItem.isSelected! ? mainThemeColor : Colors.grey), 
+                    fontSize: 11
+                  ))
+                ]
+              )
+            );
+        })
+
+
+
+      )
+    );
+  }
+}
+
+class RatingWidget extends StatelessWidget {
+
+  int? rating;
+  RatingWidget({ this.rating });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Row(
+          children: List.generate(5, (index) {
+            return Icon(
+              index &lt; this.rating! ? Icons.star : Icons.star_border,
+              color: Colors.yellow
+            );
+          })
+        ),
+        SizedBox(width: 5),
+        Text(&#39;${this.rating!}/5 Reviews&#39;,
+           style: TextStyle(
+             fontSize: 12, 
+             color: Colors.grey.withOpacity(0.7)
+          )
+        )
+      ],
+    );
+  }
+}
+
+class Attraction {
+  String? imgPath;
+  String? name;
+  String? desc;
+  double? price;
+  String? location;
+  int? rating;
+
+  Attraction({this.imgPath, this.name, this.desc, this.price, this.location, this.rating });
+}
+
+class BottomBarItem {
+  String? label;
+  bool? isSelected;
+  IconData? icon;
+  
+  BottomBarItem({ this.label, this.isSelected, this.icon });
+}
+
+</code></pre>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
